@@ -49,9 +49,19 @@ object HikariCPConfig {
       case None => Logger.debug("`databaseUrl` not present. Will use `dataSourceClassName` instead.")
     }
 
+    System.out.println("!!!!!!!!!! NEW STUFF 5 !!!!!!!!!!!!!!!!!!!!!")
+    val sslKeys = Map("trustStore" -> "javax.net.ssl.trustStore",
+      "trustStoreType" -> "javax.net.ssl.trustStoreType",
+      "trustStorePassword" -> "javax.net.ssl.trustStorePassword",
+      "keyStore" -> "javax.net.ssl.keyStore",
+      "keyStoreType" -> "javax.net.ssl.keyStoreType",
+      "keyStorePassword" -> "javax.net.ssl.keyStorePassword"
+    )
+
     config.getConfig("dataSource").foreach { dataSourceConfig =>
       dataSourceConfig.keys.foreach { key =>
-        hikariConfig.addDataSourceProperty(key, dataSourceConfig.getString(key).get)
+        val replaceKey = if (sslKeys.contains(key)) sslKeys(key) else key
+        hikariConfig.addDataSourceProperty(replaceKey, dataSourceConfig.getString(key).get)
       }
     }
 
